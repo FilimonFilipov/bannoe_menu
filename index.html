@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Банное меню — сегодня</title>
+<style>
+  :root{
+    --green:#3F5E3A; --gold:#9C7A34; --dark:#2B2B2B; --grey:#6B6B6B;
+    --bg:#FAF9F5; --card:#EDF2E6; --line:#E3DFD3;
+    --tonus:#B5651D; --relax:#3E6E8E; --breath:#2E8B72; --skin:#B0416B; --neutral:#6B6B6B;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#1E1E1A; --card:#2A2B24; --line:#3A3B33; --dark:#EDEAE0; --grey:#B9B6AA; --green:#8FBF86; }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--dark);font-family:Georgia,'Times New Roman',serif;}
+  body{padding:calc(18px + env(safe-area-inset-top,0px)) 14px 110px;max-width:640px;margin:0 auto;}
+  h1{font-size:26px;color:var(--green);text-align:center;margin:6px 0 2px;}
+  .sub{text-align:center;color:var(--gold);font-style:italic;font-size:14px;margin-bottom:4px;}
+  .updated{text-align:center;color:var(--grey);font-size:11px;margin-bottom:14px;min-height:14px;}
+  .tabs{display:flex;gap:8px;margin:14px 0 10px;}
+  .tab{flex:1;text-align:center;padding:9px;border-radius:8px;background:var(--card);color:var(--grey);font-size:14px;cursor:pointer;border:1px solid var(--line);}
+  .tab.active{background:var(--green);color:#fff;border-color:var(--green);}
+  .row{background:var(--card);border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--line);}
+  .row.edit{display:flex;align-items:flex-start;gap:10px;}
+  .row.off{opacity:.4;}
+  .row input{width:20px;height:20px;flex-shrink:0;margin-top:1px;accent-color:var(--green);}
+  .rname{font-weight:bold;color:var(--green);font-size:15px;}
+  .rtag{font-size:10px;font-weight:bold;letter-spacing:.03em;margin-left:6px;}
+  .rline{font-size:13px;margin:3px 0 0;line-height:1.4;}
+  .rlabel{font-style:italic;color:var(--grey);}
+  .toggleall{text-align:right;font-size:12px;color:var(--grey);margin:-4px 0 8px;cursor:pointer;text-decoration:underline;}
+  .empty{text-align:center;color:var(--grey);padding:30px 0;font-style:italic;}
+  .status{text-align:center;font-size:12px;color:var(--grey);margin-top:8px;min-height:16px;}
+  .footerbar{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:none;gap:8px;max-width:640px;margin:0 auto;}
+  .footerbar button{border-radius:8px;padding:12px;font-size:14px;font-family:Georgia,serif;cursor:pointer;}
+  .btn-main{flex:1;background:var(--green);color:#fff;border:none;font-size:15px;}
+  .btn-main:disabled{opacity:.5;}
+  .btn-sec{background:var(--card);color:var(--green);border:1px solid var(--green);}
+  .login{text-align:center;margin-top:28px;font-size:11px;}
+  .login a{color:var(--grey);cursor:pointer;text-decoration:underline;}
+</style>
+</head>
+<body>
+  <h1>❦ Банное меню</h1>
+  <div class="sub" id="subtitle">что есть сегодня</div>
+  <div class="updated" id="updatedAt"></div>
+  <div class="tabs">
+    <div class="tab active" data-tab="veniki">Веники</div>
+    <div class="tab" data-tab="travy">Травы</div>
+  </div>
+  <div class="toggleall" id="toggleAll" style="display:none;">отметить/снять всё</div>
+  <div id="list"></div>
+  <div class="status" id="status"></div>
+  <div class="login" id="login"><a id="loginLink">вход для редакторов</a></div>
+
+  <div class="footerbar" id="footerbar">
+    <button class="btn-sec" id="previewBtn">Как у гостя</button>
+    <button class="btn-main" id="saveBtn">Сохранить для всех</button>
+    <button class="btn-sec" id="logoutBtn" title="Выйти из режима редактирования">Выйти</button>
+  </div>
+
+<script id="items" type="application/json">{"veniki": [{"id": "v1", "name": "Берёзовый веник", "tag": "тонус", "aroma": "лёгкий, свежий, чуть смолистый с медовой ноткой", "action": "ускоряет кровообращение, снимает мышечную и суставную боль, усиливает потоотделение; фитонциды берёзы обеззараживают кожу, полезен при мелких высыпаниях"}, {"id": "v2", "name": "Берёзовый веник с шалфеем", "tag": "расслабление", "aroma": "пряный, тёплый, слегка камфорный шалфей поверх берёзовой свежести", "action": "эфирные масла шалфея успокаивают нервную систему и облегчают дыхание при простуде"}, {"id": "v3", "name": "Дуб канадский", "tag": "тонус", "aroma": "терпкий, лесной, чуть горьковатый — «дубовый» дух", "action": "дубильные вещества подтягивают и слегка обеззараживают жирную кожу, помогает нормализовать давление"}, {"id": "v4", "name": "Кленовый веник", "tag": "тонус", "aroma": "лёгкий, сладковатый, чуть смолистый — классический «осенний» дух", "action": "мягко тонизирует кожу, освежает; лист плотнее черноклёна, хорошо держит форму веника"}, {"id": "v5", "name": "Липовый веник (с цветами)", "tag": "расслабление", "aroma": "сладкий, медово-цветочный, убаюкивающий", "action": "успокаивает нервную систему, традиционно помогает при головной боли, лёгкой простуде и бессоннице"}, {"id": "v6", "name": "Можжевеловый веник", "tag": "дыхание", "aroma": "хвойный, смолистый, насыщенный «лесной» дух", "action": "мощный природный антисептик, бодрит и тонизирует; лист колючий — похлёстывать мягко, беречь лицо и глаза"}, {"id": "v7", "name": "Ореховый веник", "tag": "кожа", "aroma": "тёплый, ореховый, с лёгкой смолистой глубиной", "action": "ускоряет заживление мелких царапин и раздражений на коже, укрепляет местный иммунитет кожи"}, {"id": "v8", "name": "Пихтовый веник", "tag": "дыхание", "aroma": "хвойный, бальзамический, свежий", "action": "сильный антисептик, облегчает дыхание, традиционно помогает при мышечных и суставных болях"}, {"id": "v9", "name": "Рябиновый веник", "tag": "тонус", "aroma": "терпкий, свежий, с горчинкой — «осенний» и бодрящий", "action": "стимулирует кровообращение и бодрит; фитонциды рябины обеззараживают воздух в парной"}, {"id": "v10", "name": "Черёмуховый веник", "tag": "расслабление", "aroma": "миндально-цветочный, свежий, слегка горьковатый", "action": "мягко тонизирует, приятно ароматизирует пар; традиционно вяжут вместе с берёзой. Листья не заваривать для питья"}, {"id": "v11", "name": "Черноклён", "tag": "расслабление", "aroma": "мягкий, чуть сладковатый, тонкий «шелестящий» аромат", "action": "снимает мышечное и нервное напряжение, мягко тонизирует и успокаивает кожу"}, {"id": "v12", "name": "Эвкалипт серебристый (веник)", "tag": "дыхание", "aroma": "мягче обычного эвкалипта, сладковато-ментоловый, нерезкий", "action": "антисептический и освежающий эффект, переносится мягче классического эвкалипта — хорош для чувствительных к резким запахам"}, {"id": "v13", "name": "Эвкалиптовый веник", "tag": "дыхание", "aroma": "яркий, ментоловый, «аптечная» свежесть на весь пар", "action": "эфирные масла эвкалипта — сильный природный антисептик, облегчают дыхание и прочищают нос при простуде"}], "travy": [{"id": "t1", "name": "Багульник болотный", "tag": "дыхание", "aroma": "резкий, смолисто-хвойный, дурманящий", "steam": "отхаркивающее и антисептическое действие при кашле — использовать ЭКОНОМНО, с хорошей вентиляцией: при избытке пара возможна головная боль и головокружение", "otvar": "не завариваем для питья в бане — ядовит при неправильной дозировке, официально применяется только как аптечный препарат; противопоказан при беременности, лактации и до 18 лет"}, {"id": "t2", "name": "Бессмертник песчаный", "tag": "тонус", "aroma": "сухой, медово-соломенный, тёплый", "steam": "мягко тонизирует, ровный нерезкий аромат, хорошо переносится при долгом нахождении в парной", "otvar": "традиционно как желчегонное средство; при чувствительном желудке начинать с небольшой порции"}, {"id": "t3", "name": "Болотная мята (блошница)", "tag": "тонус", "aroma": "мятный, острый, с камфорной ноткой", "steam": "освежает и бодрит, отпугивает комаров и мошек — приятная летняя трава для предбанника", "otvar": "не рекомендуется — в концентрированном виде токсична для печени, особенно опасна при беременности; используем только для аромата пара"}, {"id": "t4", "name": "Донник лекарственный", "tag": "расслабление", "aroma": "сладковатый, «сенной», с нотой ванили", "steam": "успокаивает нервную систему, снимает тревожность", "otvar": "мягко влияет на сосуды, традиционное успокоительное и снотворное"}, {"id": "t5", "name": "Душица обыкновенная", "tag": "расслабление", "aroma": "тёплый, пряно-цветочный, чуть медовый", "steam": "смягчает кашель и першение, успокаивает, настраивает на сон", "otvar": "отхаркивающее действие, облегчает кашель изнутри"}, {"id": "t6", "name": "Золотарник канадский", "tag": "тонус", "aroma": "медово-цветочный, тёплый, слегка пряный", "steam": "лёгкое противовоспалительное действие, поднимает настроение ароматом, бодрит", "otvar": "мягкое мочегонное и противовоспалительное — для суставов и мочевыводящих путей, в больших количествах не увлекаться"}, {"id": "t7", "name": "Мелисса лекарственная", "tag": "расслабление", "aroma": "нежный, лимонно-травяной, свежий", "steam": "успокаивает нервную систему, снимает напряжение, освежает дыхание", "otvar": "традиционное успокоительное и снотворное средство, мягко снижает тревожность"}, {"id": "t8", "name": "Пижма обыкновенная", "tag": "тонус", "aroma": "резкий, камфорно-горьковатый, «аптечный»", "steam": "прочищает нос, бодрит, лёгкий антисептик для кожи", "otvar": "не рекомендуется — токсична при приёме внутрь, используем только для запаривания"}, {"id": "t9", "name": "Полынь горькая", "tag": "тонус", "aroma": "степной, пряно-горький, насыщенный", "steam": "бодрит, поднимает тонус, освежает голову", "otvar": "возбуждает аппетит и улучшает пищеварение; в больших дозах токсична, дозировать умеренно"}, {"id": "t10", "name": "Полынь обыкновенная (чернобыльник)", "tag": "расслабление", "aroma": "мягче горькой полыни, травянисто-пряный", "steam": "мягко снимает усталость, успокаивает без резкости", "otvar": "лёгкое тонизирующее и успокаивающее действие"}, {"id": "t11", "name": "Тысячелистник обыкновенный", "tag": "кожа", "aroma": "пряно-травяной, слегка терпкий, ровный", "steam": "мягко действует на кожу, снимает мелкие покраснения и раздражения", "otvar": "выраженное кровоостанавливающее и противовоспалительное действие"}, {"id": "t12", "name": "Шалфей лекарственный", "tag": "тонус", "aroma": "тёплый, пряно-камфорный, слегка ментоловый", "steam": "антисептическое и противовоспалительное действие, смягчает горло и облегчает дыхание", "otvar": "традиционно применяется при боли в горле и воспалениях полости рта, мягко успокаивает"}, {"id": "t13", "name": "Крапива двудомная", "tag": "не для пара", "aroma": "практически отсутствует, в пару не проявляется", "special": [["Отвар (для приёма внутрь)", "кровоостанавливающее и общеукрепляющее действие, богата витаминами; пьют короткими курсами как чай"], ["Обливание/ополаскивание", "тонизирует и освежает кожу, слегка сужает поры"], ["Для волос", "традиционно используется для ополаскивания — укрепляет корни, добавляет блеск, уменьшает выпадение"]]}]}</script>
+
+<script>
+(function(){
+  var ITEMS = JSON.parse(document.getElementById('items').textContent);
+  var TAGCOLOR = {'тонус':'var(--tonus)','расслабление':'var(--relax)','дыхание':'var(--breath)','кожа':'var(--skin)','не для пара':'var(--neutral)'};
+  var off = {};            // id -> true when NOT available
+  var updatedAt = '';
+  var editor = false, previewGuest = false, activeTab = 'veniki';
+  var token = '';
+  try{ token = localStorage.getItem('banya_token') || ''; }catch(e){}
+  var fileSha = null;
+
+  function $(id){ return document.getElementById(id); }
+  function setStatus(t){ $('status').textContent = t || ''; }
+
+  // ---------- repo detection (works on username.github.io/repo/) ----------
+  function detectRepo(){
+    var m = location.hostname.match(/^(.+)\.github\.io$/);
+    if(m){
+      var parts = location.pathname.split('/').filter(Boolean);
+      var repo = parts.length && parts[0].indexOf('.') === -1 ? parts[0] : location.hostname;
+      return {owner:m[1], repo:repo};
+    }
+    try{ var s = JSON.parse(localStorage.getItem('banya_repo') || 'null'); if(s) return s; }catch(e){}
+    return null;
+  }
+  var cfg = detectRepo();
+
+  // ---------- helpers ----------
+  function b64enc(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function b64dec(b64){ return decodeURIComponent(escape(atob(b64.replace(/\s/g,'')))); }
+  function withTimeout(ms){
+    var c = new AbortController(); setTimeout(function(){ c.abort(); }, ms); return c.signal;
+  }
+  function apiUrl(){ return 'https://api.github.com/repos/' + cfg.owner + '/' + cfg.repo + '/contents/state.json'; }
+  function apiHeaders(){ return {'Authorization':'Bearer ' + token, 'Accept':'application/vnd.github+json'}; }
+
+  function applyState(obj){
+    off = {};
+    (obj.off || []).forEach(function(id){ off[id] = true; });
+    updatedAt = obj.updatedAt || '';
+  }
+
+  function fmtDate(iso){
+    if(!iso) return '';
+    try{
+      var d = new Date(iso);
+      return 'обновлено ' + d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'}) + ' в ' + d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+    }catch(e){ return ''; }
+  }
+
+  // ---------- loading ----------
+  async function loadPublic(){
+    try{
+      var r = await fetch('state.json?t=' + Date.now(), {cache:'no-store', signal: withTimeout(10000)});
+      if(r.ok) applyState(await r.json());
+    }catch(e){ /* first run / offline: everything available */ }
+  }
+  async function loadFromApi(){
+    var r = await fetch(apiUrl() + '?t=' + Date.now(), {headers: apiHeaders(), cache:'no-store', signal: withTimeout(15000)});
+    if(r.status === 401 || r.status === 403) throw new Error('токен не подходит');
+    if(r.status === 404) throw new Error('не найден файл state.json в репозитории');
+    if(!r.ok) throw new Error('ошибка ' + r.status);
+    var j = await r.json();
+    fileSha = j.sha;
+    applyState(JSON.parse(b64dec(j.content)));
+  }
+
+  // ---------- rendering ----------
+  function line(label, text){
+    var d = document.createElement('div'); d.className = 'rline';
+    var l = document.createElement('span'); l.className = 'rlabel'; l.textContent = label + ': ';
+    d.appendChild(l); d.appendChild(document.createTextNode(text));
+    return d;
+  }
+  function head(item){
+    var f = document.createDocumentFragment();
+    var nm = document.createElement('span'); nm.className = 'rname'; nm.textContent = item.name;
+    var tg = document.createElement('span'); tg.className = 'rtag';
+    tg.style.color = TAGCOLOR[item.tag] || 'var(--tonus)'; tg.textContent = item.tag.toUpperCase();
+    f.appendChild(nm); f.appendChild(tg);
+    return f;
+  }
+  function editRow(item){
+    var row = document.createElement('div');
+    row.className = 'row edit' + (off[item.id] ? ' off' : '');
+    var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !off[item.id];
+    cb.addEventListener('change', function(){
+      if(cb.checked) delete off[item.id]; else off[item.id] = true;
+      row.classList.toggle('off', !cb.checked);
+      setStatus('Есть несохранённые изменения');
+    });
+    var wrap = document.createElement('div');
+    wrap.appendChild(head(item));
+    wrap.appendChild(line('Аромат', item.aroma));
+    row.appendChild(cb); row.appendChild(wrap);
+    return row;
+  }
+  function viewRow(item){
+    var row = document.createElement('div'); row.className = 'row';
+    row.appendChild(head(item));
+    row.appendChild(line('Аромат', item.aroma));
+    if(item.special){
+      item.special.forEach(function(p){ row.appendChild(line(p[0], p[1])); });
+    } else if(item.action !== undefined){
+      row.appendChild(line('Действие', item.action));
+    } else {
+      row.appendChild(line('Пар', item.steam));
+      row.appendChild(line('Отвар', item.otvar));
+    }
+    return row;
+  }
+
+  function render(){
+    var asEditor = editor && !previewGuest;
+    $('updatedAt').textContent = fmtDate(updatedAt);
+    $('subtitle').textContent = asEditor ? 'отметьте, что есть в наличии' : (editor ? 'так видит гость' : 'что есть сегодня');
+    $('toggleAll').style.display = asEditor ? 'block' : 'none';
+    $('footerbar').style.display = editor ? 'flex' : 'none';
+    $('login').style.display = editor ? 'none' : 'block';
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab === activeTab); });
+    var list = $('list'); list.innerHTML = '';
+    var items = ITEMS[activeTab].filter(function(i){ return asEditor || !off[i.id]; });
+    if(!items.length){
+      var e = document.createElement('div'); e.className = 'empty';
+      e.textContent = 'Сегодня ничего из этой категории нет в наличии';
+      list.appendChild(e); return;
+    }
+    items.forEach(function(i){ list.appendChild(asEditor ? editRow(i) : viewRow(i)); });
+  }
+
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click', function(){ activeTab = t.dataset.tab; render(); });
+  });
+  $('toggleAll').addEventListener('click', function(){
+    var cat = ITEMS[activeTab];
+    var allOn = cat.every(function(i){ return !off[i.id]; });
+    cat.forEach(function(i){ if(allOn) off[i.id] = true; else delete off[i.id]; });
+    setStatus('Есть несохранённые изменения'); render();
+  });
+  $('previewBtn').addEventListener('click', function(){
+    previewGuest = !previewGuest;
+    this.textContent = previewGuest ? 'Назад к редактированию' : 'Как у гостя';
+    render();
+  });
+
+  // ---------- editor login / logout ----------
+  async function enterEditor(){
+    if(!cfg){
+      var rp = prompt('Адрес репозитория в формате  логин/название  (например: anna/banya):');
+      if(!rp || rp.indexOf('/') < 1) return;
+      cfg = {owner: rp.split('/')[0].trim(), repo: rp.split('/')[1].trim()};
+      try{ localStorage.setItem('banya_repo', JSON.stringify(cfg)); }catch(e){}
+    }
+    if(!token){
+      token = (prompt('Вставьте токен доступа (его вам дали для редактирования):') || '').trim();
+      if(!token) return;
+    }
+    setStatus('Проверяю доступ…');
+    try{
+      await loadFromApi();
+      try{ localStorage.setItem('banya_token', token); }catch(e){}
+      editor = true; setStatus(''); render();
+    }catch(e){
+      token = '';
+      try{ localStorage.removeItem('banya_token'); }catch(e2){}
+      setStatus('Не удалось войти: ' + (e && e.message ? e.message : e));
+    }
+  }
+  $('loginLink').addEventListener('click', enterEditor);
+  $('logoutBtn').addEventListener('click', async function(){
+    try{ localStorage.removeItem('banya_token'); }catch(e){}
+    token = ''; editor = false; previewGuest = false; setStatus('');
+    await loadPublic(); render();
+  });
+
+  // ---------- saving ----------
+  $('saveBtn').addEventListener('click', async function(){
+    var btn = this; btn.disabled = true; btn.textContent = 'Сохраняю…';
+    try{
+      // fetch latest sha right before writing (in case another editor saved meanwhile)
+      var r0 = await fetch(apiUrl() + '?t=' + Date.now(), {headers: apiHeaders(), cache:'no-store', signal: withTimeout(15000)});
+      if(!r0.ok) throw new Error('не удалось прочитать файл (' + r0.status + ')');
+      fileSha = (await r0.json()).sha;
+      updatedAt = new Date().toISOString();
+      var body = {message: 'update menu', content: b64enc(JSON.stringify({updatedAt: updatedAt, off: Object.keys(off)}, null, 2)), sha: fileSha};
+      var r = await fetch(apiUrl(), {method:'PUT', headers: apiHeaders(), body: JSON.stringify(body), signal: withTimeout(20000)});
+      if(!r.ok) throw new Error('ошибка записи ' + r.status);
+      fileSha = (await r.json()).content.sha;
+      setStatus('Сохранено. У гостей обновится примерно через минуту.');
+      $('updatedAt').textContent = fmtDate(updatedAt);
+    }catch(e){
+      setStatus('Не удалось сохранить: ' + (e && e.name === 'AbortError' ? 'нет ответа, попробуйте ещё раз' : (e.message || e)));
+    }
+    btn.disabled = false; btn.textContent = 'Сохранить для всех';
+  });
+
+  // ---------- start ----------
+  (async function(){
+    await loadPublic();
+    render();
+    if(token && cfg){ await enterEditor(); }   // auto-enter on devices that are already logged in
+  })();
+})();
+</script>
+</body>
+</html>
